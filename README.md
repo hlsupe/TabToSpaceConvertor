@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/ngfkjqw782ttb747/branch/master?svg=true)](https://ci.appveyor.com/project/hlsupe/tabtospacesconvertor/branch/master)
+
 # TabToSpacesConvertor
 Converts tabs to a configurable number of spaces.
 
