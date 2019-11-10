@@ -1,51 +1,74 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using FluentAssertions;
+using Xunit;
 
 namespace TabToSpacesConvertorTests
 {
-    [TestClass]
-    public class FourSpacesTabToSpacesConvertorShould
-    {
-        [TestMethod]
-        public void ReturnEmptyStringWhenEmptyStringProvided()
-            => Assert.AreEqual(string.Empty, FourSpacesTabConvertor().Convert(string.Empty));
+	public class FourSpacesTabToSpacesConvertorShould
+	{
+		private string TabConvertor(string input)
+		{
+			return new TabToSpacesConvertor.TabToSpacesConvertor(4).Convert(input);
+		}
 
-        [TestMethod]
-        public void ReturnNullStringWhenNullStringProvided()
-            => Assert.AreEqual(null, FourSpacesTabConvertor().Convert(null));
+		private string RepeatSpaces(int spacesToAdd)
+		{
+			return new string(' ', spacesToAdd);
+		}
 
-        [TestMethod]
-        public void ReplaceWith4SpacesWhenTabIsAlreadyAtTabStop()
-            => Assert.AreEqual("Test" + RepeatSpaces(4) + "String", FourSpacesTabConvertor().Convert("Test\tString"));
+		[FactAttribute]
+		public void PreserveMultipleNewLineCharactersBackToBack()
+		{
+			TabConvertor("Tes\t\n\n\nString\n").Should()
+				.Be("Tes" + RepeatSpaces(1) + "\n\n\nString\n");
+		}
 
-        [TestMethod]
-        public void ReplaceWith8SpacesWhenTabIsAlreadyAtTabStopAndFollowedByAnotherTab()
-            => Assert.AreEqual("Test" + RepeatSpaces(8) + "String", FourSpacesTabConvertor().Convert("Test\t\tString"));
+		[FactAttribute]
+		public void PreserveNewLineCharacters()
+		{
+			TabConvertor("Tes\t\nString\n").Should().Be("Tes" + RepeatSpaces(1) + "\nString\n");
+		}
 
-        [TestMethod]
-        public void ReplaceWith3SpacesWhenTabIsAtSecondCharacter()
-            => Assert.AreEqual("T" + RepeatSpaces(3) + "String", FourSpacesTabConvertor().Convert("T\tString"));
+		[FactAttribute]
+		public void ReplaceWith1SpacesWhenTabIsAtFourthCharacter()
+		{
+			TabConvertor("Tes\tString").Should().Be("Tes" + RepeatSpaces(1) + "String");
+		}
 
-        [TestMethod]
-        public void ReplaceWith2SpacesWhenTabIsAtThirdCharacter()
-            => Assert.AreEqual("Te" + RepeatSpaces(2) + "String", FourSpacesTabConvertor().Convert("Te\tString"));
+		[FactAttribute]
+		public void ReplaceWith2SpacesWhenTabIsAtThirdCharacter()
+		{
+			TabConvertor("Te\tString").Should().Be("Te" + RepeatSpaces(2) + "String");
+		}
 
-        [TestMethod]
-        public void ReplaceWith1SpacesWhenTabIsAtFourthCharacter()
-            => Assert.AreEqual("Tes" + RepeatSpaces(1) + "String", FourSpacesTabConvertor().Convert("Tes\tString"));
+		[FactAttribute]
+		public void ReplaceWith3SpacesWhenTabIsAtSecondCharacter()
+		{
+			TabConvertor("T\tString").Should().Be("T" + RepeatSpaces(3) + "String");
+		}
 
-        [TestMethod]
-        public void PreserveNewLineCharacters() =>
-            Assert.AreEqual("Tes" + RepeatSpaces(1) + "\nString\n",
-                FourSpacesTabConvertor().Convert("Tes\t\nString\n"));
 
-        [TestMethod]
-        public void PreserveMultipleNewLineCharactersBackToBack() =>
-            Assert.AreEqual("Tes" + RepeatSpaces(1) + "\n\n\nString\n",
-                FourSpacesTabConvertor().Convert("Tes\t\n\n\nString\n"));
+		[FactAttribute]
+		public void ReplaceWith4SpacesWhenTabIsAlreadyAtTabStop()
+		{
+			TabConvertor("Test\tString").Should().Be("Test" + RepeatSpaces(4) + "String");
+		}
 
-        private TabToSpacesConvertor.TabToSpacesConvertor FourSpacesTabConvertor() =>
-            new TabToSpacesConvertor.TabToSpacesConvertor(4);
+		[FactAttribute]
+		public void ReplaceWith8SpacesWhenTabIsAlreadyAtTabStopAndFollowedByAnotherTab()
+		{
+			TabConvertor("Test\t\tString").Should().Be("Test" + RepeatSpaces(8) + "String");
+		}
 
-        private string RepeatSpaces(int spacesToAdd) => new string(' ', spacesToAdd);
-    }
+		[FactAttribute]
+		public void ReturnEmptyStringWhenEmptyStringProvided()
+		{
+			TabConvertor(string.Empty).Should().BeEmpty();
+		}
+
+		[FactAttribute]
+		public void ReturnNullStringWhenNullStringProvided()
+		{
+			TabConvertor(null).Should().BeNull();
+		}
+	}
 }
