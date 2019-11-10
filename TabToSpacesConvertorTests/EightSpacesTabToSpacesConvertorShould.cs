@@ -1,25 +1,36 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using FluentAssertions;
+using Xunit;
 
 namespace TabToSpaceConvertorTests
 {
-    [TestClass]
-    public class EightSpacesTabToSpaceConvertorShould
-    {
-        [TestMethod]
-        public void ReplaceWith8SpacesWhenTabIsAlreadyAtTabStop()
-            => Assert.AreEqual("TestStri" + RepeatSpaces(8) + "ng", EightSpacesTabConvertor().Convert("TestStri\tng"));
+	public class EightSpacesTabToSpaceConvertorShould
+	{
+		private string TabConvertor(string input)
+		{
+			return new TabToSpacesConvertor.TabToSpacesConvertor(8).Convert(input);
+		}
 
-        [TestMethod]
-        public void ReplaceWith7SpacesWhenTabIsAtSecondCharacter()
-            => Assert.AreEqual("T" + RepeatSpaces(7) + "String", EightSpacesTabConvertor().Convert("T\tString"));
+		private string RepeatSpaces(int spacesToAdd)
+		{
+			return new string(' ', spacesToAdd);
+		}
 
-        [TestMethod]
-        public void ReplaceWith1SpacesWhenTabIsAtEighthCharacter()
-            => Assert.AreEqual("TestStr" + RepeatSpaces(1) + "ing", EightSpacesTabConvertor().Convert("TestStr\ting"));
+		[FactAttribute]
+		public void ReplaceWith1SpacesWhenTabIsAtEighthCharacter()
+		{
+			TabConvertor("TestStr\ting").Should().Be("TestStr" + RepeatSpaces(1) + "ing");
+		}
 
-        private TabToSpacesConvertor.TabToSpacesConvertor EightSpacesTabConvertor() =>
-            new TabToSpacesConvertor.TabToSpacesConvertor(8);
+		[FactAttribute]
+		public void ReplaceWith7SpacesWhenTabIsAtSecondCharacter()
+		{
+			TabConvertor("T\tString").Should().Be("T" + RepeatSpaces(7) + "String");
+		}
 
-        private string RepeatSpaces(int spacesToAdd) => new string(' ', spacesToAdd);
-    }
+		[FactAttribute]
+		public void ReplaceWith8SpacesWhenTabIsAlreadyAtTabStop()
+		{
+			TabConvertor("TestStri\tng").Should().Be("TestStri" + RepeatSpaces(8) + "ng");
+		}
+	}
 }
